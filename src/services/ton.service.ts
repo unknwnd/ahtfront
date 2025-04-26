@@ -80,7 +80,7 @@ export class TonService {
     try {
       const walletAddress = this.tonConnectUI.account?.address;
       if (!walletAddress) return '0';
-
+      
       // Заглушка для демонстрации
       console.log('Запрос баланса для адреса', walletAddress);
       

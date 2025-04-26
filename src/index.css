@@ -2,13 +2,77 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global Mobile Optimizations */
+:root {
+  --vh: 1vh;
+  --vw: 1vw;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+html {
+  height: -webkit-fill-available;
+}
+
+body {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  min-height: calc(100 * var(--vh, 1vh));
+  max-width: 100vw;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+input, textarea, button, select {
+  font-size: 16px; /* Предотвращает автоматический зум на iOS */
+}
+
+/* Отключение выделения текста на мобильных устройствах */
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Разрешить выделение текста в элементах, где это нужно */
+input, textarea, [contenteditable="true"] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
+/* Улучшение скролла на мобильных устройствах */
+@media (max-width: 768px) {
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Исправления для фиксированных элементов в iOS */
+  .fixed {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}
+
+/* Fix iOS input padding */
+@supports (-webkit-touch-callout: none) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
+
+/* Предотвращение смены цвета фона при клике на iOS */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 @layer base {
   html, body {
     @apply bg-tg-light-bg text-tg-light-text dark:bg-dark-900 dark:text-dark-100;
-    -webkit-tap-highlight-color: transparent;
     overscroll-behavior: none;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
   * {

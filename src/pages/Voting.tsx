@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { toast } from 'react-toastify';
 import GradientButton from '../components/ui/GradientButton';
+import PageTransition from '../components/PageTransition';
 
 // Фирменные цвета для градиентов
 const BRAND_COLORS = {
@@ -279,9 +280,10 @@ const VotingCard = ({ voting, index }: { voting: typeof MOCK_VOTINGS[0], index: 
       initial="hidden"
       animate="visible"
       variants={cardVariants}
-      className="card overflow-hidden backdrop-blur-lg bg-gray-900/40 rounded-xl border border-gray-800"
+      className="overflow-hidden backdrop-blur-lg bg-black/40 rounded-2xl border border-gray-800 relative group"
     >
-      <div className="flex flex-col md:flex-row p-6 gap-6">
+      <div className="absolute -inset-0.5 rounded-2xl bg-white/5 blur opacity-30 group-hover:opacity-50 transition-opacity"></div>
+      <div className="flex flex-col md:flex-row p-6 md:p-8 gap-6 relative z-10">
         {/* Информация об учреждении - левая колонка (2/3 ширины) */}
         <div className="w-full md:w-2/3">
           <div className="flex justify-between items-start mb-3">
@@ -450,8 +452,9 @@ const VotingCard = ({ voting, index }: { voting: typeof MOCK_VOTINGS[0], index: 
       {/* Модальное окно с информацией о голосовании */}
       {showVotingInfo && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-gray-900 rounded-xl p-6 max-w-md w-full relative border border-gray-800 overflow-hidden">
+          <div className="bg-gray-900 rounded-2xl p-6 max-w-md w-full relative border border-gray-800 overflow-hidden">
             {/* Фирменный градиент на фоне модального окна */}
+            <div className="absolute -inset-0.5 rounded-2xl bg-white/5 blur opacity-30"></div>
             <div className="absolute inset-0 opacity-10" style={{ background: getBrandGradient() }}></div>
             
             <button 
@@ -491,8 +494,9 @@ const VotingCard = ({ voting, index }: { voting: typeof MOCK_VOTINGS[0], index: 
       {/* Модальное окно с реквизитами для помощи */}
       {showDetails && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-gray-900 rounded-xl p-6 max-w-md w-full relative border border-gray-800 overflow-hidden">
+          <div className="bg-gray-900 rounded-2xl p-6 max-w-md w-full relative border border-gray-800 overflow-hidden">
             {/* Фирменный градиент на фоне модального окна */}
+            <div className="absolute -inset-0.5 rounded-2xl bg-white/5 blur opacity-30"></div>
             <div className="absolute inset-0 opacity-10" style={{ background: getBrandGradient() }}></div>
             
             <button 
@@ -562,6 +566,24 @@ interface VotingProps {
 }
 
 const Voting: React.FC<VotingProps> = ({ ton }) => {
+  // Простая анимация всплывания для текста заголовка
+  const simplePopupVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: 40,
+      scale: 0.95
+    },
+    visible: (delay = 0) => ({ 
+      opacity: 1, 
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.7,
+        delay,
+        ease: "easeOut"
+      }
+    })
+  };
   // Состояния компонента
   const [votings, setVotings] = useState(MOCK_VOTINGS);
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
@@ -703,10 +725,11 @@ const Voting: React.FC<VotingProps> = ({ ton }) => {
   const logoImageUrl = "https://i.ibb.co/GBQrN2B/image.png";
 
   return (
-    <div 
-      ref={containerRef}
-      className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white relative overflow-hidden"
-    >
+    <PageTransition>
+      <div 
+        ref={containerRef}
+        className="min-h-screen bg-gradient-to-b from-black to-gray-900 text-white relative overflow-hidden"
+      >
       {/* Эффект свечения из глубины */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         {[0, 1, 2, 3, 4].map((index) => (
@@ -716,52 +739,67 @@ const Voting: React.FC<VotingProps> = ({ ton }) => {
       
       {/* Фоновый логотип с эффектом скролла */}
       <motion.div 
-        className="absolute top-20 right-10 opacity-30 z-0 pointer-events-none hidden lg:block"
-        style={{ 
+        className="absolute top-[1.5%] right-[10%] w-[40vw] h-[40vw] md:w-[30vw] md:h-[30vw] z-0"
+        style={{
           y: logoY,
           rotate: logoRotate,
           scale: logoScale,
-          filter: 'contrast(1.1) brightness(0.3) drop-shadow(0 0 10px rgba(0,0,0,0.2))',
-          mixBlendMode: 'normal'
         }}
       >
-        <img 
-          src={logoImageUrl} 
-          alt="AHT Logo" 
-          className="w-96 h-96 object-contain" 
-        />
+        <div className="relative w-full h-full">
+          {/* Логотип с затемнением */}
+          <div 
+            className="absolute inset-0 bg-black/20" 
+            style={{
+              backgroundImage: `url(${logoImageUrl})`,
+              backgroundSize: 'contain',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              transform: 'scale(1.05)',
+              backgroundBlendMode: 'multiply',
+              filter: 'contrast(1.1) brightness(0.3) drop-shadow(0 0 10px rgba(0,0,0,0.2))',
+              mixBlendMode: 'normal'
+            }}
+          />
+        </div>
       </motion.div>
       
-      <div className="container mx-auto px-4 py-8 relative z-10">
+      <div className="max-w-4xl mx-auto px-5 py-12 relative z-10">
         <motion.div
           initial="hidden"
           animate="visible"
           variants={titleVariants}
-          className="mb-8"
+          className="mb-24 mt-16 md:mt-24"
         >
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6">
             <div>
               <motion.div 
                 className="mb-6 text-gray-300 text-xs uppercase tracking-widest"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
+                variants={simplePopupVariants}
+                custom={0.1}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: false, amount: 0.8 }}
               >
                 Blockchain Charity Platform
               </motion.div>
-              <motion.h1 
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="text-5xl md:text-7xl font-light tracking-tight leading-tight mb-4"
+              <motion.div 
+                className="mb-4 text-5xl md:text-7xl font-light tracking-tight leading-tight"
+                variants={simplePopupVariants}
+                custom={0.3}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: false, amount: 0.8 }}
               >
                 Голосования
-              </motion.h1>
+              </motion.div>
               <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-base md:text-lg text-gray-300 mb-6"
+                variants={simplePopupVariants}
+                custom={0.5}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: false, amount: 0.8 }}
+                className="text-base md:text-lg text-gray-300 mb-8 w-full"
                 style={{ fontSize: "calc(1rem * 1.7 * 0.65)" }}
               >
                 Примите участие в управлении фондом Animal Helper Token и решении важных вопросов благотворительности.
@@ -770,20 +808,30 @@ const Voting: React.FC<VotingProps> = ({ ton }) => {
             
             {/* Кнопка предложения нового голосования - отображается только в первую неделю месяца */}
             {isFirstWeek && (
-              <GradientButton 
-                onClick={createVoting}
-                className="mt-4 lg:mt-0"
+              <motion.div
+                variants={simplePopupVariants}
+                custom={0.7}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: false, amount: 0.8 }}
               >
-                Предложить новое голосование
-              </GradientButton>
+                <GradientButton 
+                  onClick={createVoting}
+                  className="mt-4 lg:mt-0"
+                >
+                  Предложить новое голосование
+                </GradientButton>
+              </motion.div>
             )}
           </div>
           
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-wrap gap-3 mb-6"
+            variants={simplePopupVariants}
+            custom={0.6}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.8 }}
+            className="flex flex-wrap gap-3 mb-6 mt-8"
           >
             <GradientButton
               onClick={() => setFilter('all')}
@@ -809,7 +857,7 @@ const Voting: React.FC<VotingProps> = ({ ton }) => {
           </motion.div>
         </motion.div>
         
-        <div className="space-y-6">
+        <div className="space-y-8">
           {filteredVotings.length > 0 ? (
             filteredVotings.map((voting, index) => (
               <VotingCard key={voting.id} voting={voting} index={index} />
@@ -819,9 +867,10 @@ const Voting: React.FC<VotingProps> = ({ ton }) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
-              className="text-center py-12 backdrop-blur-sm bg-gray-900/30 rounded-xl border border-gray-800"
+              className="text-center py-12 backdrop-blur-sm bg-gray-900/30 rounded-xl border border-gray-800 relative"
             >
-              <p className="text-gray-300">Голосования не найдены</p>
+              <div className="absolute -inset-0.5 rounded-xl bg-white/5 blur opacity-30"></div>
+              <p className="text-gray-300 relative z-10">Голосования не найдены</p>
             </motion.div>
           )}
         </div>
@@ -830,17 +879,19 @@ const Voting: React.FC<VotingProps> = ({ ton }) => {
       {/* Модальное окно с формой для нового предложения */}
       {showProposalForm && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
-          <div className="bg-gray-900 rounded-xl p-6 max-w-2xl w-full relative my-8">
+          <div className="bg-gray-900 rounded-2xl p-6 max-w-2xl w-full relative my-8 border border-gray-800 overflow-hidden">
+            <div className="absolute -inset-0.5 rounded-2xl bg-white/5 blur opacity-30"></div>
             <button 
               onClick={closeProposalForm}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white"
+              className="absolute top-4 right-4 text-gray-400 hover:text-white z-10"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
             
-            <h3 className="text-xl font-semibold text-white mb-6">Предложить новое голосование</h3>
+            <div className="relative z-10">
+              <h3 className="text-xl font-semibold text-white mb-6">Предложить новое голосование</h3>
             
             <div className="mb-4 text-gray-300 text-sm">
               <p>
@@ -959,11 +1010,13 @@ const Voting: React.FC<VotingProps> = ({ ton }) => {
                 </GradientButton>
               </div>
             </form>
+            </div>
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </PageTransition>
   );
 };
 
-export default Voting; 
+export default Voting;
