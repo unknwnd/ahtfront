@@ -4,6 +4,7 @@ import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import Layout from './components/layout/Layout';
 import Home from './pages/Home';
 import Shelter from './pages/Shelter';
+import Shelters from './pages/Shelters';
 import Community from './pages/Community';
 import CommDetails from './pages/CommDetails';
 import Voting from './pages/Voting';
@@ -52,6 +53,7 @@ const App: React.FC<AppProps> = ({ tma, ton }) => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/shelter" element={<Shelter />} />
+          <Route path="/shelters" element={<Shelters />} />
           <Route path="/community" element={<Community />} />
           <Route path="/community/:id" element={<CommDetails />} />
           <Route path="/voting" element={<Voting ton={ton} />} />

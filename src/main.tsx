@@ -3,14 +3,20 @@ import './polyfills'
 
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
 import './index.css'
 import 'react-toastify/dist/ReactToastify.css'
 import { tmaService } from './services/tma.service';
 import { tonService } from './services/ton.service';
+import { ThemeProvider } from './context/ThemeContext';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App tma={tmaService} ton={tonService} />
+    <ThemeProvider>
+      <BrowserRouter>
+        <App tma={tmaService} ton={tonService} />
+      </BrowserRouter>
+    </ThemeProvider>
   </React.StrictMode>,
 )
