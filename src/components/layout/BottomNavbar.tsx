@@ -10,7 +10,7 @@ const navItems = [
 
 // Компонент иконки
 const NavIcon = ({ icon, isActive }: { icon: string; isActive: boolean }) => {
-  const activeClass = isActive ? 'text-primary-500' : 'text-dark-300';
+  const activeClass = isActive ? 'text-brand-blue-dark' : 'text-dark-300';
   
   const renderIcon = () => {
     switch (icon) {
@@ -50,43 +50,42 @@ const BottomNavbar = () => {
   const location = useLocation();
   
   return (
-    <nav className="bottom-nav">
-      <div className="max-w-5xl mx-auto">
-        <ul className="flex justify-around">
-          {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            
-            return (
-              <li key={item.path} className="relative">
-                <Link
-                  to={item.path}
-                  className="flex flex-col items-center py-2 px-4"
-                >
-                  <motion.div 
-                    className={`nav-icon ${isActive ? 'bg-dark-500' : 'bg-dark-700'}`}
-                    whileHover={{ y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <NavIcon icon={item.icon} isActive={isActive} />
-                  </motion.div>
-                  <span className={`text-xs mt-1 ${isActive ? 'text-dark-50' : 'text-dark-300'}`}>
-                    {item.label}
-                  </span>
-                  {isActive && (
-                    <motion.div
-                      layoutId="navIndicator"
-                      className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-primary-500 rounded-full"
-                      initial={false}
-                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    />
-                  )}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-    </nav>
+    <motion.nav 
+      className="bottom-nav"
+      initial={{ y: 100 }}
+      animate={{ y: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+    >
+      <ul className="flex w-full justify-between items-center">
+        {navItems.map((item) => {
+          const isActive = location.pathname === item.path;
+          
+          return (
+            <li key={item.path} className="w-1/4">
+              <Link
+                to={item.path}
+                className="flex flex-col items-center justify-center py-1"
+              >
+                <div className={`${isActive ? 'text-brand-blue-dark' : 'text-dark-300'}`}>
+                  <NavIcon icon={item.icon} isActive={isActive} />
+                </div>
+                <span className={`text-xs mt-1 ${isActive ? 'font-medium text-brand-blue-dark' : 'text-dark-300'}`}>
+                  {item.label}
+                </span>
+                {isActive && (
+                  <motion.div
+                    layoutId="navIndicator"
+                    className="w-6 h-1 bg-brand-blue-dark rounded-full mt-1"
+                    initial={false}
+                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                  />
+                )}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </motion.nav>
   );
 };
 

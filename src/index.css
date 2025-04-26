@@ -8,6 +8,11 @@
   --vw: 1vw;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  --font-size-sm: clamp(0.75rem, 0.68rem + 0.35vw, 0.94rem);
+  --font-size-base: clamp(0.875rem, 0.79rem + 0.43vw, 1.125rem);
+  --font-size-lg: clamp(1rem, 0.9rem + 0.5vw, 1.5rem);
+  --font-size-xl: clamp(1.25rem, 1.125rem + 0.63vw, 2rem);
+  --font-size-2xl: clamp(1.5rem, 1.35rem + 0.75vw, 2.5rem);
 }
 
 html {
@@ -22,6 +27,7 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-size: var(--font-size-base);
 }
 
 input, textarea, button, select {
@@ -225,5 +231,169 @@ input, textarea, [contenteditable="true"] {
            bg-white/90 dark:bg-dark-800/90 backdrop-blur-md
            border-t border-brand-blue-light/20 dark:border-dark-600 
            shadow-depth py-2 px-4;
+  }
+
+  /* Стили логотипа */
+  .logo-container {
+    @apply flex flex-col items-center justify-center;
+  }
+  
+  .logo-image {
+    @apply w-32 h-32 md:w-48 md:h-48;
+  }
+  
+  .logo-title {
+    @apply text-4xl font-bold mb-2;
+  }
+  
+  .logo-subtitle {
+    @apply text-base text-center max-w-xs;
+  }
+}
+
+h1 { font-size: var(--font-size-2xl); }
+h2 { font-size: var(--font-size-xl); }
+h3 { font-size: var(--font-size-lg); }
+small, .text-sm { font-size: var(--font-size-sm); }
+
+/* Touch-оптимизации */
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+}
+
+button, 
+a, 
+input, 
+select, 
+textarea {
+  min-height: 44px;
+  min-width: 44px;
+  margin: 4px;
+  padding: 8px 12px;
+  touch-action: manipulation;
+}
+
+/* Улучшенная прокрутка для touch-устройств */
+.scrollable-container {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+/* Мобильные медиа-запросы */
+@media screen and (max-width: 768px) {
+  :root {
+    --mobile-padding: 12px;
+    --mobile-gap: 8px;
+  }
+
+  .container {
+    padding: var(--mobile-padding);
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: var(--mobile-gap);
+  }
+
+  .flex-responsive {
+    flex-direction: column;
+  }
+
+  .hide-mobile {
+    display: none !important;
+  }
+  
+  /* Оптимизация нижней навигации */
+  .bottom-nav {
+    @apply flex justify-around items-center py-3 px-2;
+    height: 64px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .bottom-nav a, .bottom-nav button {
+    @apply flex flex-col items-center justify-center;
+    min-height: 56px;
+    margin: 0;
+    padding: 4px;
+    width: 20%;
+  }
+  
+  .bottom-nav svg {
+    @apply w-6 h-6 mb-1;
+  }
+  
+  .bottom-nav span {
+    @apply text-xs font-medium;
+    margin-top: 2px;
+  }
+  
+  /* Оптимизация главного контейнера */
+  #root {
+    padding-bottom: 64px; /* Отступ для нижней навигации */
+  }
+  
+  /* Оптимизация заголовков */
+  .title-lg {
+    @apply text-2xl mb-3;
+  }
+  
+  .title-md {
+    @apply text-xl mb-2;
+  }
+
+  /* Оптимизация логотипа на мобильных */
+  .logo-container {
+    @apply pb-6;
+  }
+  
+  .logo-image {
+    @apply w-24 h-24;
+  }
+  
+  .logo-title {
+    @apply text-3xl mb-1;
+  }
+  
+  .logo-subtitle {
+    @apply text-sm px-4;
+  }
+  
+  /* Оптимизация главного экрана */
+  .main-container {
+    @apply flex flex-col items-center justify-start pt-4;
+    height: calc(100vh - 64px);
+  }
+  
+  /* Основные карточки */
+  .card {
+    @apply p-4 mb-4 w-full;
+    max-width: calc(100% - 16px);
+  }
+  
+  .card-md {
+    @apply p-3 mb-3;
+  }
+  
+  /* Исправление отступов и полей */
+  button, 
+  a, 
+  input, 
+  select, 
+  textarea {
+    margin: 2px;
+  }
+}
+
+/* Оптимизация для узких экранов */
+@media screen and (max-width: 375px) {
+  :root {
+    --mobile-padding: 8px;
+    --mobile-gap: 4px;
+  }
+
+  body {
+    font-size: var(--font-size-sm);
   }
 }

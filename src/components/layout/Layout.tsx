@@ -75,13 +75,32 @@ const Layout = ({ children }: LayoutProps) => {
     }
   }, [location.pathname]);
 
+  // Определяем классы для разных страниц
+  const getMainClasses = () => {
+    const baseClasses = "relative z-10 w-full h-full overflow-y-auto overflow-x-hidden scrollable-container";
+    
+    if (isHomePage) {
+      return `${baseClasses} main-container`;
+    }
+    
+    return baseClasses;
+  };
+
   return (
     <div className={`min-h-screen h-[calc(100*var(--vh,1vh))] w-screen max-w-full overflow-x-hidden bg-brand-gray dark:bg-dark-900 text-brand-blue-dark dark:text-white transition-colors duration-300`}>
       <div className="absolute inset-0 bg-brand-blue-light/5 dark:bg-transparent z-0 pointer-events-none" />
-      <div className="relative z-10 w-full h-full">
-        <main ref={mainRef} className="pt-0 pb-24 px-4 w-full h-full overflow-y-auto overflow-x-hidden">
+      <div className={getMainClasses()}>
+        <main ref={mainRef} className="pt-0 pb-16 px-0 md:px-4 w-full h-full">
           <div className="w-full max-w-5xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="container mx-auto"
+            >
               {children}
+            </motion.div>
           </div>
         </main>
         <Footer />
