@@ -1,132 +1,116 @@
-import { WebApp } from '@tma.js/sdk';
+// Временная заглушка для TMA SDK, так как текущая версия устарела
+// Используйте @telegram-apps/sdk в будущем
 
-class TMAService {
-  private webApp: typeof WebApp | null = null;
-  private isInitialized = false;
+// Определение интерфейса для Telegram WebApp
+interface TelegramWebApp {
+  ready: () => void;
+  colorScheme: string;
+  MainButton: {
+    show: () => void;
+    hide: () => void;
+    setText: (text: string) => void;
+    onClick: (callback: () => void) => void;
+  };
+  close: () => void;
+  sendData: (data: string) => void;
+  initDataUnsafe?: {
+    user?: {
+      id: number;
+      first_name?: string;
+      last_name?: string;
+      username?: string;
+    };
+  };
+  openLink: (url: string) => void;
+  showAlert: (message: string) => void;
+  showConfirm: (message: string, callback: (confirmed: boolean) => void) => void;
+}
+
+// Определяем тип для Telegram
+interface TelegramType {
+  WebApp?: TelegramWebApp;
+}
+
+export class TMAService {
+  private webApp: TelegramWebApp | null = null;
 
   constructor() {
-    // Проверяем, доступен ли Telegram Web App
-    this.initialize();
+    // Инициализация перенесена в метод initialize
   }
 
-  // Инициализация TMA
-  initialize() {
-    try {
-      if (window?.Telegram?.WebApp) {
-        this.webApp = window.Telegram.WebApp;
+  // Метод для инициализации WebApp
+  async initialize(): Promise<void> {
+    // Инициализация WebApp из Telegram
+    if (typeof window !== 'undefined') {
+      const telegram = window as Window & { Telegram?: TelegramType };
+      this.webApp = telegram.Telegram?.WebApp || null;
+      if (this.webApp) {
         this.webApp.ready();
-        this.isInitialized = true;
-        
-        // Настройка некоторых базовых параметров WebApp
-        this.webApp.expand();
-        
-        // Устанавливаем цвет кнопки "Назад" в соответствии с темой
-        const isDarkTheme = this.webApp.colorScheme === 'dark';
-        this.webApp.setBackgroundColor(isDarkTheme ? '#1F2937' : '#F9FAFB');
-        
-        console.log('TMA SDK успешно инициализирован');
-      } else {
-        console.warn('Telegram WebApp не обнаружен. Работаем в режиме браузера.');
+        console.log('Telegram WebApp initialized');
       }
-    } catch (error) {
-      console.error('Ошибка при инициализации TMA SDK:', error);
     }
+    return Promise.resolve();
   }
 
-  // Проверка инициализации
   isReady(): boolean {
-    return this.isInitialized;
+    return !!this.webApp;
   }
 
-  // Получение темы Telegram
-  getColorScheme(): 'light' | 'dark' {
+  getColorScheme(): string {
     return this.webApp?.colorScheme || 'light';
   }
 
-  // Получение данных пользователя из Telegram
-  getUserData() {
-    if (!this.isInitialized) return null;
+  setupMainButton(params?: { text: string; onClick: () => void }): void {
+    if (!this.webApp) return;
     
-    try {
-      const initData = this.webApp?.initData;
-      if (!initData) return null;
-      
-      // Здесь должна быть валидация initData перед использованием
-      // через @grammyjs/validator для защиты от подделки
-      
-      return this.webApp?.initDataUnsafe?.user || null;
-    } catch (error) {
-      console.error('Ошибка при получении данных пользователя:', error);
-      return null;
+    if (params?.text) {
+      this.webApp.MainButton.setText(params.text);
     }
+    
+    if (params?.onClick) {
+      this.webApp.MainButton.onClick(params.onClick);
+    }
+    
+    this.webApp.MainButton.show();
   }
 
-  // Показать всплывающее сообщение в Telegram
-  showAlert(message: string) {
-    if (!this.isInitialized) {
-      console.warn('TMA не инициализирован, алерт не будет показан');
-      return;
-    }
-    
+  hideMainButton(): void {
+    this.webApp?.MainButton.hide();
+  }
+
+  close(): void {
+    this.webApp?.close();
+  }
+
+  sendData(data: unknown): void {
+    this.webApp?.sendData(JSON.stringify(data));
+  }
+
+  getUserData(): unknown {
+    return this.webApp?.initDataUnsafe?.user || null;
+  }
+
+  showAlert(message: string): void {
     this.webApp?.showAlert(message);
   }
 
-  // Показать всплывающее сообщение с подтверждением в Telegram
-  showConfirm(message: string): Promise<boolean> {
-    return new Promise((resolve) => {
-      if (!this.isInitialized) {
-        console.warn('TMA не инициализирован, диалог не будет показан');
-        resolve(false);
-        return;
-      }
-      
-      this.webApp?.showConfirm(message, (confirmed) => {
-        resolve(confirmed);
-      });
-    });
-  }
-
-  // Закрыть мини-приложение
-  close() {
-    if (this.isInitialized) {
-      this.webApp?.close();
+  showConfirm(message: string, callback: (confirmed: boolean) => void): void {
+    if (this.webApp) {
+      this.webApp.showConfirm(message, callback);
+    } else {
+      const confirmed = window.confirm(message);
+      callback(confirmed);
     }
   }
 
-  // Настройка кнопки основного действия в верхней панели Telegram
-  setupMainButton(text: string, color: string, textColor: string, callback: () => void) {
-    if (!this.isInitialized) return;
-    
-    const mainButton = this.webApp?.MainButton;
-    if (!mainButton) return;
-    
-    mainButton.setText(text);
-    mainButton.setParams({
-      color: color,
-      text_color: textColor,
-    });
-    
-    mainButton.onClick(callback);
-    mainButton.show();
-  }
-
-  // Скрыть кнопку основного действия
-  hideMainButton() {
-    if (this.isInitialized && this.webApp?.MainButton) {
-      this.webApp.MainButton.hide();
+  // Открываем ссылку в браузере
+  openLink(url: string): void {
+    if (this.webApp) {
+      this.webApp.openLink(url);
+    } else {
+      window.open(url, '_blank');
     }
-  }
-
-  // Отправить данные боту Telegram
-  sendData(data: string) {
-    if (!this.isInitialized) {
-      console.warn('TMA не инициализирован, данные не будут отправлены');
-      return;
-    }
-    
-    this.webApp?.sendData(data);
   }
 }
 
-// Экспортируем синглтон сервиса
-export const tmaService = new TMAService(); 
+export const tmaService = new TMAService();

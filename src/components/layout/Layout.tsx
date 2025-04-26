@@ -4,15 +4,22 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Footer from './Footer';
 import { useTMA } from '../../hooks/useTMA';
 import { useTheme } from '../../hooks/useTheme';
+import { TMAService } from '../../services/tma.service';
+import { TonService } from '../../services/ton.service';
 
 interface LayoutProps {
   children: ReactNode;
+  tma?: TMAService;
+  ton?: TonService;
 }
 
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
-  const { isReady, tma } = useTMA();
+  const { isReady, tma: tmaHook } = useTMA();
   const { theme } = useTheme();
+  
+  // Используем tmaHook из хука, так как свойство tma может быть не передано
+  const tma = tmaHook;
   
   // Проверяем, находимся ли мы на главной странице
   const isHomePage = location.pathname === '/';

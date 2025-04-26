@@ -1,4 +1,4 @@
-import React from "react";
+// import React from "react";
 import { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useTonConnect } from '../hooks/useTonConnect';
@@ -288,7 +288,7 @@ const Home = () => {
         >
           <div className="border-l border-white/20 pl-6 md:pl-8">
             <motion.h2 variants={textReveal} className="text-3xl md:text-4xl font-light mb-8">
-              Манифест
+              Наши цели
             </motion.h2>
             <div className="space-y-6">
               <motion.p variants={textReveal} className="text-xl md:text-2xl font-light leading-relaxed">

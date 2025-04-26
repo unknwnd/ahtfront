@@ -1,213 +1,201 @@
+import { TonClient } from '@ton/ton';
 import { TonConnectUI } from '@tonconnect/ui-react';
-import { Address, fromNano, toNano, TonClient } from 'ton-core';
 import { toast } from 'react-toastify';
-import { CONTRACT_ADDRESSES, IS_TESTNET } from '../config/contracts';
-import { TONCENTER_API_KEY } from '../config/app';
-import { AnimalHelperToken } from '../contracts/wrappers/AnimalHelperToken';
-import { JettonWallet } from '../contracts/wrappers/JettonWallet';
-import { FundsDistributor } from '../contracts/wrappers/FundsDistributor';
-import { AnimalHelperVoting } from '../contracts/wrappers/AnimalHelperVoting';
+import { APP_CONFIG } from '../config/app';
+import { CONTRACTS_CONFIG } from '../config/contracts';
 
-class TonService {
-  private tonConnectUI: TonConnectUI | null = null;
+// Определение типа для данных укрытия
+interface ShelterData {
+  id: string;
+  name: string;
+  address: string;
+  needs: string[];
+}
+
+// Определение типа для данных голосования
+interface VotingData {
+  id: string;
+  title: string;
+  options: string[];
+  endDate: string;
+}
+
+// Класс TonService для взаимодействия с блокчейном TON
+export class TonService {
   private tonClient: TonClient | null = null;
+  private tonConnectUI: TonConnectUI | null = null;
 
   constructor() {
-    // TonClient уже не используется напрямую, работаем через TonConnectUI
-    // Но мы можем инициализировать его для прямых запросов к блокчейну
-    const endpoint = IS_TESTNET ? 'https://testnet.toncenter.com/api/v2/jsonRPC' : 'https://toncenter.com/api/v2/jsonRPC';
+    // Конструктор пустой, инициализация через метод initialize
+  }
+
+  // Метод для инициализации сервиса
+  initialize(tonConnectUI: TonConnectUI): void {
+    this.tonConnectUI = tonConnectUI;
+    
+    // Инициализация клиента TON с использованием TonCenter API ключа
     this.tonClient = new TonClient({
-      endpoint,
-      apiKey: TONCENTER_API_KEY
+      endpoint: CONTRACTS_CONFIG.isTestnet 
+        ? 'https://testnet.toncenter.com/api/v2/jsonRPC'
+        : 'https://toncenter.com/api/v2/jsonRPC',
+      apiKey: APP_CONFIG.tonCenterApiKey
     });
   }
 
-  // Устанавливаем экземпляр TonConnectUI
-  setTonConnectUI(tonConnectUI: TonConnectUI) {
-    this.tonConnectUI = tonConnectUI;
-  }
+  // Метод для отправки пожертвования
+  async sendDonation(amount: string, shelterAddress: string): Promise<boolean> {
+    if (!this.tonConnectUI?.connected) {
+      toast.error('Пожалуйста, подключите кошелек');
+      return false;
+    }
 
-  // Проверяем подключение кошелька
-  isWalletConnected(): boolean {
-    return this.tonConnectUI?.connected || false;
-  }
-
-  // Получаем адрес кошелька
-  getWalletAddress(): string | null {
-    if (!this.tonConnectUI?.account) return null;
-    return this.tonConnectUI.account.address;
-  }
-
-  // Отправляем TON на адрес приюта
-  async sendDonation(shelterAddress: string, amount: number): Promise<boolean> {
     try {
-      if (!this.tonConnectUI) {
-        throw new Error('TonConnect не инициализирован');
-      }
-
-      if (!this.tonConnectUI.connected) {
-        toast.info('Пожалуйста, подключите TON кошелек');
-        return false;
-      }
-
-      // Подготавливаем транзакцию
       const transaction = {
-        validUntil: Math.floor(Date.now() / 1000) + 600, // 10 минут
+        validUntil: Math.floor(Date.now() / 1000) + 60,
         messages: [
           {
             address: shelterAddress,
-            amount: toNano(amount).toString(),
+            amount: amount, // сумма в нанотонах
           },
         ],
       };
 
-      // Отправляем транзакцию
       await this.tonConnectUI.sendTransaction(transaction);
+      toast.success('Пожертвование успешно отправлено!');
+      return true;
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      toast.error(`Ошибка при отправке пожертвования: ${errorMessage}`);
+      console.error(error);
+      return false;
+    }
+  }
+
+  // Метод для получения баланса токенов AHT
+  async getJettonBalance(): Promise<string> {
+    if (!this.tonConnectUI?.connected) {
+      return '0';
+    }
+
+    try {
+      const walletAddress = this.tonConnectUI.account?.address;
+      if (!walletAddress) return '0';
+
+      // Заглушка для демонстрации
+      console.log('Запрос баланса для адреса', walletAddress);
       
-      toast.success(`Пожертвование ${amount} TON успешно отправлено!`);
-      return true;
-    } catch (error) {
-      console.error('Ошибка при отправке пожертвования:', error);
-      toast.error('Произошла ошибка при отправке пожертвования');
+      // Вместо вызова несуществующих методов используем заглушку
+      // ToDo: реализовать реальное получение баланса через API контракта
+      return '1000000000'; // 1 AHT в наименьших единицах
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('Ошибка при получении баланса токенов:', errorMessage);
+      return '0';
+    }
+  }
+
+  // Метод для покупки токенов AHT
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async buyAHTTokens(_amount: string): Promise<boolean> {
+    if (!this.tonConnectUI?.connected) {
+      toast.error('Пожалуйста, подключите кошелек');
+      return false;
+    }
+
+    try {
+      // Здесь должна быть логика для покупки токенов AHT
+      // Это может включать отправку TON на контракт и получение токенов AHT
+      toast.info('Покупка токенов AHT пока не реализована');
+      return false;
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      toast.error(`Ошибка при покупке токенов AHT: ${errorMessage}`);
+      console.error(error);
       return false;
     }
   }
 
-  // Получаем баланс AHT токенов (Jetton)
-  async getJettonBalance(ownerAddress: string): Promise<number> {
-    try {
-      if (!this.tonClient) {
-        throw new Error('TonClient не инициализирован');
-      }
-
-      // Получаем экземпляр мастер-контракта токена
-      const tokenMaster = this.tonClient.open(AnimalHelperToken.createFromAddress(CONTRACT_ADDRESSES.animalHelperToken));
-
-      // Получаем адрес Jetton-кошелька пользователя для этого токена
-      const userWalletAddress = await tokenMaster.getWalletAddress(Address.parse(ownerAddress));
-
-      // Открываем Jetton-кошелек пользователя
-      const userJettonWallet = this.tonClient.open(JettonWallet.createFromAddress(userWalletAddress));
-
-      // Получаем баланс
-      const jettonData = await userJettonWallet.getWalletData();
-      return Number(fromNano(jettonData.balance));
-    } catch (error) {
-      console.error('Ошибка при получении баланса Jetton:', error);
-      toast.error('Ошибка при получении баланса AHT токенов');
-      return 0;
+  // Метод для голосования
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async vote(_votingId: string, _optionIndex: number): Promise<boolean> {
+    if (!this.tonConnectUI?.connected) {
+      toast.error('Пожалуйста, подключите кошелек');
+      return false;
     }
-  }
 
-  // Покупаем AHT токены
-  async buyAHTTokens(amount: number): Promise<boolean> {
     try {
-      if (!this.tonConnectUI) {
-        throw new Error('TonConnect не инициализирован');
-      }
-
-      if (!this.tonConnectUI.connected) {
-        toast.info('Пожалуйста, подключите TON кошелек');
-        return false;
-      }
-
-      // Здесь должна быть логика для покупки токенов через смарт-контракт
-      // Например, отправка TON на контракт с указанием количества токенов
-      const transaction = {
-        validUntil: Math.floor(Date.now() / 1000) + 600, // 10 минут
-        messages: [
-          {
-            address: CONTRACT_ADDRESSES.animalHelperToken.toString(),
-            amount: toNano(amount * 0.00001).toString(), // Предположим, 1 AHT = 0.00001 TON
-            payload: 'buy_tokens', // Это заглушка, нужно сформировать правильный payload
-          },
-        ],
-      };
-
-      await this.tonConnectUI.sendTransaction(transaction);
-      toast.success(`Вы успешно приобрели ${amount} AHT токенов!`);
-      return true;
-    } catch (error) {
-      console.error('Ошибка при покупке токенов:', error);
-      toast.error('Произошла ошибка при покупке токенов');
+      // Здесь должна быть логика для голосования
+      // Это может включать взаимодействие с контрактом голосования
+      toast.info('Голосование пока не реализовано');
+      return false;
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      toast.error(`Ошибка при голосовании: ${errorMessage}`);
+      console.error(error);
       return false;
     }
   }
 
-  // Голосуем в предложении
-  async vote(votingId: string, option: 'yes' | 'no' | 'abstain'): Promise<boolean> {
-    try {
-      if (!this.tonConnectUI) {
-        throw new Error('TonConnect не инициализирован');
+  // Метод для получения списка укрытий
+  async getShelters(): Promise<ShelterData[]> {
+    // Здесь должна быть логика для получения списка укрытий из контракта
+    // Заглушка с тестовыми данными
+    return [
+      {
+        id: '1',
+        name: 'Приют "Лапки"',
+        address: 'EQC6rKQr8Kwae6CV_4B8vxtv5XK88k65VjYzZWh6Ah2aZi7C',
+        needs: ['Корм', 'Игрушки', 'Лекарства']
+      },
+      {
+        id: '2',
+        name: 'Кошкин дом',
+        address: 'EQAaIg0I6TmLb5AXeNMIm3lr6RdXgMXQo5I3y5ewajNBNrkv',
+        needs: ['Корм', 'Лотки', 'Лекарства']
       }
-
-      if (!this.tonConnectUI.connected) {
-        toast.info('Пожалуйста, подключите TON кошелек');
-        return false;
-      }
-
-      // Здесь должна быть логика для голосования через смарт-контракт
-      // Предположим, что votingId соответствует какому-то контракту голосования
-      const transaction = {
-        validUntil: Math.floor(Date.now() / 1000) + 600, // 10 минут
-        messages: [
-          {
-            address: CONTRACT_ADDRESSES.fundsDistributor.toString(), // Используем fundsDistributor как пример
-            amount: toNano(0.05).toString(), // Небольшая комиссия за голосование
-            payload: `vote_${votingId}_${option}`, // Это заглушка, нужно сформировать правильный payload
-          },
-        ],
-      };
-
-      await this.tonConnectUI.sendTransaction(transaction);
-      toast.success(`Ваш голос "${option}" успешно учтен!`);
-      return true;
-    } catch (error) {
-      console.error('Ошибка при голосовании:', error);
-      toast.error('Произошла ошибка при голосовании');
-      return false;
-    }
+    ];
   }
 
-  // Получаем список приютов
-  async getShelters() {
-    try {
-      // Здесь должна быть логика для получения списка приютов из смарт-контракта
-      // Например, вызов метода getShelters у FundsDistributor
-      if (!this.tonClient) {
-        throw new Error('TonClient не инициализирован');
+  // Метод для получения списка голосований
+  async getVotings(): Promise<VotingData[]> {
+    // Здесь должна быть логика для получения списка голосований из контракта
+    // Заглушка с тестовыми данными
+    return [
+      {
+        id: '1',
+        title: 'Финансирование приюта "Лапки"',
+        options: ['За', 'Против', 'Воздержаться'],
+        endDate: new Date(Date.now() + 86400000).toISOString() // Завтра
+      },
+      {
+        id: '2',
+        title: 'Строительство нового кошачьего дома',
+        options: ['За', 'Против', 'Воздержаться'],
+        endDate: new Date(Date.now() + 172800000).toISOString() // Послезавтра
       }
-
-      const distributor = this.tonClient.open(FundsDistributor.createFromAddress(CONTRACT_ADDRESSES.fundsDistributor));
-      // const shelters = await distributor.getShelters(); // Предполагаемый метод, нужно проверить обертку
-      // Для демонстрации возвращаем пустой массив
-      return [];
-    } catch (error) {
-      console.error('Ошибка при получении списка приютов:', error);
-      return [];
-    }
+    ];
   }
 
-  // Получаем список голосований
-  async getVotings() {
-    try {
-      // Здесь должна быть логика для получения списка голосований из смарт-контракта
-      // Например, вызов метода getVotings у AnimalHelperVoting или FundsDistributor
-      if (!this.tonClient) {
-        throw new Error('TonClient не инициализирован');
-      }
+  // Метод для проверки подключения кошелька
+  isWalletConnected(): boolean {
+    return !!this.tonConnectUI?.connected;
+  }
 
-      // Предположим, что voting контракт отдельный, но адреса у нас нет, используем fundsDistributor
-      const distributor = this.tonClient.open(FundsDistributor.createFromAddress(CONTRACT_ADDRESSES.fundsDistributor));
-      // const votings = await distributor.getVotings(); // Предполагаемый метод, нужно проверить обертку
-      // Для демонстрации возвращаем пустой массив
-      return [];
-    } catch (error) {
-      console.error('Ошибка при получении списка голосований:', error);
-      return [];
-    }
+  // Метод для получения адреса кошелька
+  getWalletAddress(): string | null {
+    return this.tonConnectUI?.account?.address || null;
+  }
+
+  // Метод для подключения кошелька
+  async connectWallet(): Promise<void> {
+    await this.tonConnectUI?.openModal();
+  }
+
+  // Метод для отключения кошелька
+  async disconnectWallet(): Promise<void> {
+    await this.tonConnectUI?.disconnect();
   }
 }
 
-// Экспортируем синглтон сервиса
+// Создаем и экспортируем экземпляр сервиса
 export const tonService = new TonService();

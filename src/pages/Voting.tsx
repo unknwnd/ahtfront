@@ -556,24 +556,34 @@ const VotingCard = ({ voting, index }: { voting: typeof MOCK_VOTINGS[0], index: 
   );
 };
 
-const Voting = () => {
-  // Состояния приложения
-  const [tonConnectUI] = useTonConnectUI();
+// Обновляем определение компонента Voting
+interface VotingProps {
+  ton?: any; // Сервис TON
+}
+
+const Voting: React.FC<VotingProps> = ({ ton }) => {
+  // Состояния компонента
+  const [votings, setVotings] = useState(MOCK_VOTINGS);
   const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
   const [showProposalForm, setShowProposalForm] = useState(false);
-  
-  // Состояние формы предложения
-  const [proposal, setProposal] = useState({
-    name: '',
-    type: '',
-    address: '',
-    phone: '',
-    website: '',
-    requisites: ''
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    facilityName: '',
+    facilityType: 'shelter',
+    facilityAddress: '',
+    facilityPhone: '',
+    facilityWebsite: '',
+    facilityRequisites: '',
+    requestedAmount: '',
+    days: '15'
   });
   
-  // Ref для основного контейнера (для эффекта скролла)
+  // Рефы для элементов интерфейса
   const containerRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const glow1Ref = useRef<HTMLDivElement>(null);
+  const glow2Ref = useRef<HTMLDivElement>(null);
   
   // Хук для отслеживания скролла
   const { scrollYProgress } = useScroll({
@@ -581,11 +591,32 @@ const Voting = () => {
     offset: ["start start", "end end"]
   });
   
-  // Трансформация значений скролла для анимации логотипа
+  // TonConnect состояния и хуки
+  const [connectedWallet, setConnectedWallet] = useState('');
+  const [tonConnectUI] = useTonConnectUI();
+  
+  // Производные состояния от скролла
+  const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.2], [1, 0.8]);
+  const y = useTransform(scrollYProgress, [0, 0.2], [0, -50]);
+  const headerY = useTransform(scrollYProgress, [0, 0.1], [0, -20]);
+  const headerOpacity = useTransform(scrollYProgress, [0, 0.1, 0.2], [0, 0.8, 1]);
+  
+  // Добавляем трансформации для логотипа
   const logoY = useTransform(scrollYProgress, [0, 1], [0, 100]);
   const logoRotate = useTransform(scrollYProgress, [0, 1], [30, 45]);
   const logoScale = useTransform(scrollYProgress, [0, 0.5, 1], [1.5, 1.4, 1.3]);
-  
+
+  // Проверяем, подключен ли кошелек
+  useEffect(() => {
+    if (tonConnectUI.connected) {
+      const address = tonConnectUI.account?.address || '';
+      setConnectedWallet(address);
+    } else {
+      setConnectedWallet('');
+    }
+  }, [tonConnectUI.connected, tonConnectUI.account]);
+
   // Фильтруем голосования по статусу
   const filteredVotings = MOCK_VOTINGS.filter(voting => {
     if (filter === 'all') return true;
@@ -624,7 +655,7 @@ const Voting = () => {
   // Обработчик изменения полей формы
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setProposal(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   // Обработчик отправки формы
@@ -636,13 +667,17 @@ const Voting = () => {
     setShowProposalForm(false);
     
     // Сбрасываем форму
-    setProposal({
-      name: '',
-      type: '',
-      address: '',
-      phone: '',
-      website: '',
-      requisites: ''
+    setFormData({
+      title: '',
+      description: '',
+      facilityName: '',
+      facilityType: 'shelter',
+      facilityAddress: '',
+      facilityPhone: '',
+      facilityWebsite: '',
+      facilityRequisites: '',
+      requestedAmount: '',
+      days: '15'
     });
   };
 
@@ -822,8 +857,8 @@ const Voting = () => {
                   </label>
                   <input
                     type="text"
-                    name="name"
-                    value={proposal.name}
+                    name="title"
+                    value={formData.title}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
@@ -835,8 +870,8 @@ const Voting = () => {
                     Тип учреждения*
                   </label>
                   <select
-                    name="type"
-                    value={proposal.type}
+                    name="facilityType"
+                    value={formData.facilityType}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
@@ -856,8 +891,8 @@ const Voting = () => {
                   </label>
                   <input
                     type="text"
-                    name="address"
-                    value={proposal.address}
+                    name="facilityAddress"
+                    value={formData.facilityAddress}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
@@ -870,8 +905,8 @@ const Voting = () => {
                   </label>
                   <input
                     type="tel"
-                    name="phone"
-                    value={proposal.phone}
+                    name="facilityPhone"
+                    value={formData.facilityPhone}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
@@ -884,8 +919,8 @@ const Voting = () => {
                   </label>
                   <input
                     type="url"
-                    name="website"
-                    value={proposal.website}
+                    name="facilityWebsite"
+                    value={formData.facilityWebsite}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
@@ -897,8 +932,8 @@ const Voting = () => {
                   </label>
                   <input
                     type="text"
-                    name="requisites"
-                    value={proposal.requisites}
+                    name="facilityRequisites"
+                    value={formData.facilityRequisites}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 bg-gray-800 text-white rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />

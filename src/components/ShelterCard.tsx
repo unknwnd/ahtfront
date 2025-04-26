@@ -23,7 +23,7 @@ const ShelterCard: React.FC<ShelterCardProps> = ({
     >
       <div className="relative h-48 overflow-hidden group">
         <img 
-          src={shelter.imageUrl} 
+          src={shelter.image} 
           alt={shelter.name} 
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />

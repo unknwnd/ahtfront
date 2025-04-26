@@ -14,3 +14,11 @@ export const BOT_API_KEY = '8117378390:AAH2HI3PJdXhATKvwIyn6O_MZuZQP_Fr5VM';
 
 // Имя Telegram бота
 export const BOT_NAME = '@AniHelpToken_bot';
+
+export const APP_CONFIG = {
+  tonCenterApiKey: 'b9e6221d187835fa1c57c996df0350c1c95942c6efac1fad6f0c78ded5275a19',
+  appAddress: 'https://t.me/AniHelpToken_bot/anihelptoken',
+  appName: 'anihelptoken',
+  botApiKey: '8117378390:AAH2HI3PJdXhATKvwIyn6O_MZuZQP_Fr5VM',
+  botName: '@AniHelpToken_bot'
+};

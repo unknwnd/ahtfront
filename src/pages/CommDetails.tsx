@@ -1,8 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { motion, Variants } from 'framer-motion';
-import { FaLink, FaArrowLeft } from 'react-icons/fa';
-import postsData from '../mocks/posts';
+import { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import GradientButton from '../components/ui/GradientButton';
 
 // Моковые данные для сообществ

@@ -43,6 +43,7 @@ export interface Voting {
   };
   requiredTokens: number;
   contract: string;
+  result?: 'passed' | 'rejected';
 }
 
 // Типы для транзакций

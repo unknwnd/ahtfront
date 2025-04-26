@@ -2,15 +2,15 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Button from './ui/Button';
 import { CheckBadgeIcon, VoteIcon } from './ui/icons';
-import { Voting } from '../types';
+import { Voting, VoteOption } from '../types';
 
 interface VotingCardProps {
   voting: Voting;
-  onVote: (votingId: string, option: 'yes' | 'no' | 'abstain') => void;
+  onVote: (votingId: string, option: VoteOption) => void;
 }
 
 const VotingCard: React.FC<VotingCardProps> = ({ voting, onVote }) => {
-  const [selectedOption, setSelectedOption] = useState<'yes' | 'no' | 'abstain' | null>(null);
+  const [selectedOption, setSelectedOption] = useState<VoteOption | null>(null);
   const [isVoting, setIsVoting] = useState(false);
   
   const handleVote = async () => {
@@ -27,10 +27,10 @@ const VotingCard: React.FC<VotingCardProps> = ({ voting, onVote }) => {
   };
   
   // Вычисляем процент голосов для каждого варианта
-  const totalVotes = voting.yesVotes + voting.noVotes + voting.abstainVotes;
-  const yesPercentage = totalVotes === 0 ? 0 : (voting.yesVotes / totalVotes) * 100;
-  const noPercentage = totalVotes === 0 ? 0 : (voting.noVotes / totalVotes) * 100;
-  const abstainPercentage = totalVotes === 0 ? 0 : (voting.abstainVotes / totalVotes) * 100;
+  const totalVotes = voting.votes.yes + voting.votes.no + voting.votes.abstain;
+  const yesPercentage = totalVotes === 0 ? 0 : (voting.votes.yes / totalVotes) * 100;
+  const noPercentage = totalVotes === 0 ? 0 : (voting.votes.no / totalVotes) * 100;
+  const abstainPercentage = totalVotes === 0 ? 0 : (voting.votes.abstain / totalVotes) * 100;
   
   return (
     <motion.div 
@@ -81,15 +81,15 @@ const VotingCard: React.FC<VotingCardProps> = ({ voting, onVote }) => {
           <div className="grid grid-cols-3 gap-2 text-xs">
             <div className="flex items-center">
               <div className="w-3 h-3 rounded-full bg-green-500 mr-1" />
-              <span className="text-brand-blue-medium dark:text-gray-300">За: {voting.yesVotes}</span>
+              <span className="text-brand-blue-medium dark:text-gray-300">За: {voting.votes.yes}</span>
             </div>
             <div className="flex items-center">
               <div className="w-3 h-3 rounded-full bg-red-500 mr-1" />
-              <span className="text-brand-blue-medium dark:text-gray-300">Против: {voting.noVotes}</span>
+              <span className="text-brand-blue-medium dark:text-gray-300">Против: {voting.votes.no}</span>
             </div>
             <div className="flex items-center">
               <div className="w-3 h-3 rounded-full bg-gray-400 mr-1" />
-              <span className="text-brand-blue-medium dark:text-gray-300">Воздержались: {voting.abstainVotes}</span>
+              <span className="text-brand-blue-medium dark:text-gray-300">Воздержались: {voting.votes.abstain}</span>
             </div>
           </div>
         </div>
@@ -154,7 +154,7 @@ const VotingCard: React.FC<VotingCardProps> = ({ voting, onVote }) => {
         )}
         
         {/* Для завершенных голосований показываем результат */}
-        {voting.status === 'completed' && (
+        {voting.status === 'completed' && voting.result && (
           <div className="mt-3 flex items-center justify-center p-3 bg-brand-blue-light/10 dark:bg-brand-blue-dark/20 rounded-lg">
             <CheckBadgeIcon className="w-5 h-5 text-brand-blue-dark dark:text-brand-blue-light mr-2" />
             <span className="text-sm font-medium text-brand-blue-dark dark:text-brand-blue-light">
