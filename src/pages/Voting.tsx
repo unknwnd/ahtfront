@@ -689,7 +689,7 @@ const Voting: React.FC<VotingProps> = ({ ton }) => {
         </Button>
         <div className="relative z-10">
           <div className="relative z-10 mt-14">
-            <h1 className="relative z-10 text-6xl md:text-7xl font-semibold text-center mb-5 text-green-400 -ml-4">
+            <h1 className="relative z-10 text-6xl md:text-7xl font-semibold text-left mb-5 text-green-400">
               <div className="leading-none font-actay-wide">{content.mainTitleVote}</div>
             </h1>
           </div>

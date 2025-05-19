@@ -3,7 +3,6 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import { AnimatePresence } from 'framer-motion';
 import Layout from '@/components/layout/Layout';
-import ScrollToTop from '@/components/ScrollToTop';
 import Home from '@/pages/Home';
 import Community from '@/pages/Community';
 import Voting from '@/pages/Voting';
@@ -43,7 +42,6 @@ const App: React.FC<AppProps> = ({ tma, ton }) => {
 
   return (
     <TonConnectUIProvider manifestUrl="https://raw.githubusercontent.com/ton-connect/demo-dapp/master/tonconnect-manifest.json">
-      <ScrollToTop />
       <Layout tma={tma} ton={ton}>
         <AnimatePresence mode="wait" initial={false}>
           <Routes location={location} key={location.pathname}>

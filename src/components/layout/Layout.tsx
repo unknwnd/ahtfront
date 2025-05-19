@@ -17,7 +17,7 @@ const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
   const { isReady, tma: tmaHook } = useTMA();
   const { theme } = useTheme();
-  const mainRef = useRef<HTMLDivElement>(null);
+  const scrollableContainerRef = useRef<HTMLDivElement>(null);
   
   // Используем tmaHook из хука, так как свойство tma может быть не передано
   const tma = tmaHook;
@@ -70,8 +70,8 @@ const Layout = ({ children }: LayoutProps) => {
   // Сбрасываем позицию прокрутки при смене страницы
   useEffect(() => {
     // Сбрасываем скролл основного контейнера
-    if (mainRef.current) {
-      mainRef.current.scrollTop = 0;
+    if (scrollableContainerRef.current) {
+      scrollableContainerRef.current.scrollTop = 0;
     }
   }, [location.pathname]);
 
@@ -95,8 +95,8 @@ const Layout = ({ children }: LayoutProps) => {
         background: 'radial-gradient(ellipse at 50% 0%, rgba(143,193,227,0.05) 0%, transparent 80%)',
       }}
     >
-      <div className={getMainClasses()}>
-        <main ref={mainRef} className="pt-0 pb-16 px-0 w-full h-full">
+      <div ref={scrollableContainerRef} className={getMainClasses()}>
+        <main className="pt-0 pb-16 px-0 w-full h-full">
           <div className="w-full">
             <motion.div
               initial={{ opacity: 0 }}

@@ -238,7 +238,6 @@ const Profile = () => {
   const [currentLang, setCurrentLang] = useState<'ru' | 'en'>('ru');
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [showAllTransactions, setShowAllTransactions] = useState(false);
-  // console.log('[Profile Render] Initial or current showAllTransactions:', showAllTransactions);
 
   const localizedContent: LanguageContent = MOCK_DATA_BY_LANG[currentLang];
 
@@ -304,7 +303,7 @@ const Profile = () => {
           <div className="text-center py-12 relative">
             <div>
               <div className="relative text-center">
-                <h1 className="relative z-10 text-7xl font-semibold text-left  mb-6 text-slate-100 font-actay-wide p-3">{localizedContent.pageTitle}</h1>
+                <h1 className="relative z-10 text-7xl font-semibold text-center  mb-6 text-slate-100 font-actay-wide p-3">{localizedContent.pageTitle}</h1>
               </div>
               <p className="text-gray-300 mb-7 text-xl">
                 {localizedContent.connectWalletPrompt}
@@ -356,12 +355,18 @@ const Profile = () => {
             <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.646.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.43.992a6.759 6.759 0 010 1.844c.008.379.137.752.43.992l1.004.827c.487.402.668 1.07.26 1.431l-1.298 2.247a1.125 1.125 0 01-1.369.49l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.689 6.689 0 01-.22.128c-.333.183-.582.495-.646.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.646-.87a6.688 6.688 0 01-.22-.127c-.325-.196-.72-.257-1.075-.124l-1.217.456a1.125 1.125 0 01-1.37-.49l-1.296-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.759 6.759 0 010-1.844c-.008-.379-.137-.752-.43-.992l-1.003-.827a1.125 1.125 0 01-.26-1.431l1.297-2.247a1.125 1.125 0 011.37-.49l1.217.456c.354.133.75.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.646-.869l.213-1.28c.09-.543.56-.94 1.11-.94zM12 15.75a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5z" />
           </svg>
         </button>
-        <div className="relative z-10 mt-14">
-          <h1 className="relative z-10 text-7xl font-semibold text-center mb-6 text-slate-100 font-actay-wide">{localizedContent.pageTitle}</h1>
+        <div className="relative z-10 mt-14 text-center">
+          <h1 className="relative z-10 text-6xl md:text-7xl font-semibold text-left mb-16 text-slate-100 font-actay-wide">
+            {localizedContent.pageTitle.split(' ').map((word, index, arr) => (
+              <div key={index} className={`leading-none ${index < arr.length - 1 ? "mb-[-10px]" : ""} font-actay-wide`}>
+                {word}
+              </div>
+            ))}
+          </h1>
         </div>
 
-        <div className="w-full px-1 py-1 relative z-10 -mt-24">
-          <div className="mb-4 -mt-12 text-center">
+        <div className="w-full px-1 py-1 relative z-10">
+          <div className="mb-4 text-center">
             <p className="relative z-10 text-xl font-light text-white-50 mb-20">
               {localizedContent.welcomeMessage}
             </p>
