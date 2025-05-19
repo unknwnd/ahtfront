@@ -87,17 +87,22 @@ const Layout = ({ children }: LayoutProps) => {
   };
 
   return (
-    <div className={`min-h-screen h-[calc(100*var(--vh,1vh))] w-screen max-w-full overflow-x-hidden bg-brand-gray dark:bg-dark-900 text-brand-blue-dark dark:text-white transition-colors duration-300`}>
-      <div className="absolute inset-0 bg-brand-blue-light/5 dark:bg-transparent z-0 pointer-events-none" />
+    <div
+      className={
+        `min-h-screen h-[calc(100*var(--vh,1vh))] w-screen w-full overflow-x-hidden bg-brand-gray dark:bg-[#1E172B] text-brand-blue-dark dark:text-white transition-colors duration-300`
+      }
+      style={{
+        background: 'radial-gradient(ellipse at 50% 0%, rgba(143,193,227,0.05) 0%, transparent 80%)',
+      }}
+    >
       <div className={getMainClasses()}>
-        <main ref={mainRef} className="pt-0 pb-16 px-0 md:px-4 w-full h-full">
-          <div className="w-full max-w-5xl mx-auto">
+        <main ref={mainRef} className="pt-0 pb-16 px-0 w-full h-full">
+          <div className="w-full">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="container mx-auto"
             >
               {children}
             </motion.div>

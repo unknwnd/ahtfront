@@ -1,9 +1,10 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
-type Theme = 'light' | 'dark';
+export type Theme = 'light' | 'dark';
 
 interface ThemeContextType {
   theme: Theme;
+  setTheme: (newTheme: Theme) => void;
   toggleTheme: () => void;
 }
 
@@ -12,27 +13,35 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export { ThemeContext };
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    // Проверяем localStorage и системные настройки
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    return savedTheme || (prefersDark ? 'dark' : 'light');
+  const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window !== 'undefined') {
+      const storedTheme = localStorage.getItem('theme') as Theme | null;
+      if (storedTheme) {
+        return storedTheme;
+      }
+    }
+    return 'dark';
   });
 
   useEffect(() => {
-    // Применяем тему к документу
     const root = window.document.documentElement;
     root.classList.remove('light', 'dark');
     root.classList.add(theme);
-    localStorage.setItem('theme', theme);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('theme', theme);
+    }
   }, [theme]);
 
+  const setNewTheme = (newTheme: Theme) => {
+    setThemeState(newTheme);
+  };
+
   const toggleTheme = () => {
-    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+    setThemeState((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme: setNewTheme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );

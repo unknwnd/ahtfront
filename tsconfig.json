@@ -2,6 +2,7 @@
   "extends": "./tsconfig.app.json",
   "include": ["src"],
   "compilerOptions": {
+    "baseUrl": ".",
     "strict": true,
     "paths": {
       "@/*": ["./src/*"],

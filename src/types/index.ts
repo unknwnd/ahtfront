@@ -66,7 +66,7 @@ export interface UserData {
 }
 
 // Типы для темы
-export type Theme = 'light' | 'dark';
+export type Theme = 'dark';
 
 // Опции голосования
 export type VoteOption = 'yes' | 'no' | 'abstain'; 

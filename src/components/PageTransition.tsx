@@ -38,7 +38,7 @@ const PageTransition: React.FC<PageTransitionProps> = ({ children }) => {
       animate="in"
       exit="out"
       variants={pageVariants}
-      className="w-full h-full"
+      className="w-full h-full font-sans"
     >
       {children}
     </motion.div>

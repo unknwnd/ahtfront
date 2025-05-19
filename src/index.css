@@ -1,3 +1,21 @@
+/* Импорт только актуальных шрифтов */
+@font-face {
+  font-family: 'ActayWide-Bold';
+  src: url('./assets/fonts/ActayWide-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Ysabeau SC';
+  src: url('./assets/fonts/YsabeauSC-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Дальнейшие стили и Tailwind импорты */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -77,16 +95,16 @@ input, textarea, [contenteditable="true"] {
 
 @layer base {
   html, body {
-    @apply bg-tg-light-bg text-tg-light-text dark:bg-dark-900 dark:text-dark-100;
+    /* background-color: #1E172B !important; */ /* Временно убираем фон html и body */
+    color: var(--tg-theme-text-color, #F7F9FB);
     overscroll-behavior: none;
-}
-
-  * {
-    @apply font-sans;
+    /* Убедимся, что нет других стилей, задающих фон, если есть - их тоже комментируем/удаляем для чистоты теста */
+    /* @apply bg-[var(--tg-theme-bg-color)] dark:bg-[var(--tg-theme-secondary-bg-color)]; */ 
   }
+
   
   #root {
-    @apply flex flex-col min-h-screen;
+    @apply flex flex-col min-h-screen h-full w-full;
   }
 }
 
@@ -118,14 +136,14 @@ input, textarea, [contenteditable="true"] {
   /* Кнопки в стиле flat design */
   .btn-flat-primary {
     @apply bg-brand-blue-dark text-white font-medium 
-           py-3 px-6 rounded-md transition-all duration-200 shadow-flat-primary
+           py-3 px-6 rounded-md transition-all duration-200 shadow-depth-sm
            hover:bg-brand-blue-dark/90 active:shadow-none active:translate-y-0.5
            focus:outline-none focus:ring-2 focus:ring-brand-blue-medium focus:ring-opacity-50;
   }
   
   .btn-flat-secondary {
     @apply bg-brand-olive text-white font-medium py-3 px-6 
-           rounded-md transition-all duration-200 shadow-flat-secondary
+           rounded-md transition-all duration-200 shadow-depth-sm
            hover:bg-brand-olive/90 active:shadow-none active:translate-y-0.5
            focus:outline-none focus:ring-2 focus:ring-brand-olive/50 focus:ring-opacity-50;
 }
@@ -149,6 +167,24 @@ input, textarea, [contenteditable="true"] {
            focus:outline-none focus:ring-2 focus:ring-brand-blue-medium focus:ring-opacity-50;
   }
   
+  .btn-ghost {
+    @apply bg-transparent text-brand-blue-dark hover:bg-brand-blue-light/10 active:bg-brand-blue-light/20
+           font-medium py-3 px-6 rounded-md transition-colors duration-200
+           focus:outline-none focus:ring-2 focus:ring-brand-blue-medium focus:ring-opacity-50;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700 active:bg-red-800
+           font-medium py-3 px-6 rounded-md transition-colors duration-200 shadow-depth-sm
+           focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50;
+  }
+
+  .btn-community {
+    @apply border-green-400 text-green-400 hover:bg-green-500 hover:text-white
+           font-medium py-3 px-6 rounded-md transition-colors duration-200
+           focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50;
+  }
+  
   /* Поля ввода */
   .input {
     @apply rounded-card-sm border border-brand-blue-light/30 dark:border-dark-400 
@@ -160,15 +196,15 @@ input, textarea, [contenteditable="true"] {
 
   /* Заголовки с новыми цветами */
   .title-lg {
-    @apply text-3xl font-bold text-brand-blue-dark dark:text-dark-50 mb-4;
+    @apply text-3xl font-bold text-brand-blue-dark dark:text-dark-50 mb-4 font-heading;
   }
 
   .title-md {
-    @apply text-2xl font-semibold text-brand-blue-dark dark:text-dark-50 mb-3;
+    @apply text-2xl font-semibold text-brand-blue-dark dark:text-dark-50 mb-3 font-heading;
 }
 
   .title-sm {
-    @apply text-lg font-medium text-brand-blue-dark dark:text-dark-50 mb-2;
+    @apply text-lg font-medium text-brand-blue-dark dark:text-dark-50 mb-2 font-heading;
   }
 
   /* Элементы списка */
@@ -247,14 +283,13 @@ input, textarea, [contenteditable="true"] {
   }
   
   .logo-subtitle {
-    @apply text-base text-center max-w-xs;
+    @apply text-base text-center;
   }
 }
 
-h1 { font-size: var(--font-size-2xl); }
-h2 { font-size: var(--font-size-xl); }
-h3 { font-size: var(--font-size-lg); }
-small, .text-sm { font-size: var(--font-size-sm); }
+h1, h2, h3, h4, h5, h6 {
+  @apply font-actay-wide;
+}
 
 /* Touch-оптимизации */
 * {
@@ -292,11 +327,6 @@ textarea {
     padding: var(--mobile-padding);
   }
 
-  .grid {
-    grid-template-columns: 1fr;
-    gap: var(--mobile-gap);
-  }
-
   .flex-responsive {
     flex-direction: column;
   }
@@ -307,7 +337,7 @@ textarea {
   
   /* Оптимизация нижней навигации */
   .bottom-nav {
-    @apply flex justify-around items-center py-3 px-2;
+    @apply flex justify-around items-center py-2 px-2;
     height: 64px;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
   }
@@ -378,10 +408,10 @@ textarea {
   
   /* Исправление отступов и полей */
   button, 
-  a, 
-  input, 
-  select, 
-  textarea {
+a, 
+input, 
+select, 
+textarea {
     margin: 2px;
   }
 }

@@ -1,21 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import { AnimatePresence } from 'framer-motion';
-import Layout from './components/layout/Layout';
-import ScrollToTop from './components/ScrollToTop';
-import Home from './pages/Home';
-import Shelters from './pages/Shelters';
-import ShelterDetails from './pages/ShelterDetails';
-import Voting from './pages/Voting';
-import Profile from './pages/Profile';
-import NotFound from './pages/NotFound';
-import { TMAService } from './services/tma.service';
-import { TonService } from './services/ton.service';
+import Layout from '@/components/layout/Layout';
+import ScrollToTop from '@/components/ScrollToTop';
+import Home from '@/pages/Home';
+import Community from '@/pages/Community';
+import Voting from '@/pages/Voting';
+import Profile from '@/pages/Profile';
+import { TMAService } from '@/services/tma.service';
+import { TonService } from '@/services/ton.service';
 import './i18n';
-
-// Импортируем страницы, даже если они пока не существуют
-import SplashScreenV2 from './pages/SplashScreenV2';
 
 interface AppProps {
   tma: TMAService;
@@ -23,7 +18,6 @@ interface AppProps {
 }
 
 const App: React.FC<AppProps> = ({ tma, ton }) => {
-  const navigate = useNavigate();
   const location = useLocation();
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -43,7 +37,7 @@ const App: React.FC<AppProps> = ({ tma, ton }) => {
 
   // Пока приложение не инициализировано, можно показать сплеш-скрин
   if (!isInitialized) {
-    return <SplashScreenV2 />;
+    return null;
     // return <SplashScreenDaily />;
   }
 
@@ -53,13 +47,11 @@ const App: React.FC<AppProps> = ({ tma, ton }) => {
       <Layout tma={tma} ton={ton}>
         <AnimatePresence mode="wait" initial={false}>
           <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<Home />} />
-          <Route path="/shelters" element={<Shelters />} />
-          <Route path="/shelters/:id" element={<ShelterDetails />} />
-          <Route path="/voting" element={<Voting ton={ton} />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/voting" element={<Voting ton={ton} />} />
+            <Route path="/profile" element={<Profile />} />
+          </Routes>
         </AnimatePresence>
       </Layout>
     </TonConnectUIProvider>
