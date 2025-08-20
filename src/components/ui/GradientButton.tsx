@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 
 export interface GradientButtonProps {
@@ -11,69 +11,68 @@ export interface GradientButtonProps {
   type?: 'button' | 'submit' | 'reset';
 }
 
-export const GradientButton: React.FC<GradientButtonProps> = ({
+const GradientButton: React.FC<GradientButtonProps> = memo(({
   onClick,
   children,
   className = "",
   isSmall = false,
   fullWidth = false,
   disabled = false,
-  type = 'button',
-  ...props
+  type = 'button'
 }) => {
+  const baseClasses = `
+    relative overflow-hidden
+    ${isSmall ? 'px-3 py-1.5 text-sm' : 'px-6 py-3 text-base'}
+    ${fullWidth ? 'w-full' : ''}
+    bg-slate-800/90 backdrop-blur-sm
+    border border-white/20
+    text-white font-medium
+    rounded-lg
+    transition-all duration-200 ease-out
+    ${disabled 
+      ? 'opacity-50 cursor-not-allowed' 
+      : 'hover:scale-105 hover:shadow-lg hover:shadow-blue-500/25 active:scale-95'
+    }
+  `;
+
+  const gradientVariants = {
+    initial: { width: '0%' },
+    animate: { width: '100%' },
+    hover: { 
+      background: 'linear-gradient(-45deg, #FF7E1D, #121212, #FFFFFF, #8860d0)',
+      transition: { duration: 0.2 }
+    }
+  };
+
   return (
     <motion.button
       type={type}
-      className={`relative overflow-hidden rounded-full ${isSmall ? 'px-8 py-3' : 'px-12 py-4'} text-white ${isSmall ? 'text-sm' : 'text-base sm:text-lg'} font-medium group cursor-pointer ${fullWidth ? 'w-full' : ''} ${disabled ? 'opacity-60 cursor-not-allowed' : ''} ${className}`}
-      whileHover={!disabled ? { 
-        scale: 1.05, 
-        boxShadow: "0 0 25px rgba(255, 126, 29, 0.4), 0 0 50px rgba(136, 96, 208, 0.3)" 
-      } : undefined}
-      whileTap={!disabled ? { 
-        scale: 0.95, 
-        boxShadow: "0 0 5px rgba(255, 255, 255, 0.4)" 
-      } : undefined}
-      animate={{
-        boxShadow: ["0 0 10px rgba(255, 126, 29, 0.3)", "0 0 20px rgba(136, 96, 208, 0.4)", "0 0 10px rgba(255, 126, 29, 0.3)"],
-      }}
-      transition={{
-        duration: 2.5,
-        repeat: Infinity,
-        repeatType: "reverse"
-      }}
-      onClick={!disabled ? onClick : undefined}
-      style={{
-        background: "rgba(25, 30, 45, 0.9)",  // темный фон с прозрачностью
-        backdropFilter: "blur(8px)",          // размытие фона
-        border: "1px solid rgba(255, 255, 255, 0.2)" // тонкая рамка
-      }}
-      {...props}
+      onClick={disabled ? undefined : onClick}
+      className={`${baseClasses} ${className}`}
+      disabled={disabled}
+      whileHover={disabled ? {} : "hover"}
+      whileTap={disabled ? {} : { scale: 0.95 }}
+      style={{ willChange: 'transform' }}
     >
-      {/* Градиентная полоса внизу кнопки */}
-      <motion.div 
-        className="absolute bottom-0 left-0 right-0 h-[2px]"
-        style={{
-          background: "linear-gradient(to right, #FF7E1D, #121212, #FFFFFF, #8860d0)",
-          boxShadow: "0 0 8px rgba(136, 96, 208, 0.6)"
-        }}
-        initial={{ scaleX: 0.3, opacity: 0.6 }}
-        animate={{ scaleX: 1, opacity: 1 }}
-        transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-      />
-      
-      {/* Анимация наведения - градиентная заливка */}
-      <motion.div 
-        className="absolute inset-0 bg-gradient-to-r from-orange-500/40 via-gray-900/40 to-purple-500/40 z-0"
-        initial={{ opacity: 0 }}
-        whileHover={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-      />
-      
-      <motion.span className="relative z-10">
+      {/* Контент кнопки */}
+      <span className="relative z-10">
         {children}
-      </motion.span>
+      </span>
+      
+      {/* Градиентная полоса внизу */}
+      {!disabled && (
+        <motion.div
+          className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-orange-500 via-gray-900 via-white to-purple-500"
+          variants={gradientVariants}
+          initial="initial"
+          animate="animate"
+          transition={{ duration: 0.6, ease: "easeInOut" }}
+        />
+      )}
     </motion.button>
   );
-};
+});
+
+GradientButton.displayName = 'GradientButton';
 
 export default GradientButton; 

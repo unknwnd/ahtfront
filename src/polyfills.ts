@@ -6,6 +6,5 @@ window.Buffer = Buffer;
 
 // Полифилы для работы с ton-core
 if (typeof window !== 'undefined') {
-  // @ts-ignore
-  window.global = window;
+  (window as any).global = window;
 } 

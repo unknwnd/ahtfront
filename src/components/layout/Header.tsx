@@ -9,7 +9,7 @@ import { formatAddress } from '../../utils/formatters';
 const Header: React.FC = () => {
   const location = useLocation();
   const { theme } = useTheme();
-  const { connected, wallet, connect, disconnect } = useTonConnect();
+  const { isConnected, wallet, connect, disconnect } = useTonConnect();
   const [isScrolled, setIsScrolled] = useState(false);
   
   useEffect(() => {
@@ -68,7 +68,7 @@ const Header: React.FC = () => {
         </nav>
         
         <div className="flex items-center gap-4">
-          {connected && wallet ? (
+          {isConnected && wallet ? (
             <div className="flex items-center gap-2">
               <Link
                 to="/profile"

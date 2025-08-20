@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:analyze": "tsc -b && vite build && npx http-server dist -p 8080 -o stats.html",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -17,6 +18,7 @@
     "buffer": "^6.0.3",
     "clsx": "^2.1.1",
     "framer-motion": "^10.18.0",
+    "phaser": "^3.90.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.49.3",
@@ -43,8 +45,10 @@
     "globals": "^13.24.0",
     "postcss": "^8.5.3",
     "react-icons": "^5.5.0",
+    "rollup-plugin-visualizer": "^6.0.3",
     "tailwind-scrollbar": "^3.0.5",
     "tailwindcss": "^3.4.17",
+    "terser": "^5.43.1",
     "ton-core": "^0.53.0",
     "typescript": "^5.3.3",
     "typescript-eslint": "^7.0.2",
